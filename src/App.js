@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from "react";
 
 function App() {
   const [query, setQuery] = useState("apple");
+  const [load, setLoad] = useState(false)
   const [words1, setWords1] = useState([]);
   const [font, setFont] = useState("sans-serif");
   const [changeMood, setIsChangeMood] = useState(false)
+  const [searchWord, setSearchWord] = useState("apple")
   const [error,setError] = useState("")
   const changeTextColor = changeMood ? {color:"black", textAlign:"center" } : {color:"white", textAlign:"center"}
   function handleFont(chooseFont) {
@@ -12,14 +14,17 @@ function App() {
   }
   useEffect(
     function () {
+      if(!searchWord) return
+
        //const controller = new AbortController();
       async function fetchWordMeaning() {
+        setLoad(true)
         try {
           const res = await fetch(
-            `https://api.dictionaryapi.dev/api/v2/entries/en/${query}`,
+            `https://api.dictionaryapi.dev/api/v2/entries/en/${searchWord}`,
             //{ signal: controller.signal }
           );
-          if (res.status === 404) throw new Error(`${query} is not a valid word ❌`);
+          if (res.status === 404) throw new Error(`${searchWord} is not a valid word ❌`);
           if (!res.ok) throw new Error(`Error ${res.status}:server error❌`);
           const data = await res.json();
           setWords1(data);
@@ -29,11 +34,14 @@ function App() {
         } catch (err) {
           if(err.message === "Failed to fetch"){
             setError(`Error server error❌`)
+            setWords1([])
 
           }
           
           setError(err.message)
            console.log(err)
+        } finally{
+          setLoad(true)
         }
       }
       if(query) fetchWordMeaning();
@@ -41,7 +49,7 @@ function App() {
       //   controller.abort();
       // };
     },
-    [query]
+    [searchWord]
   );
 
   useEffect(function(){
@@ -51,7 +59,7 @@ function App() {
     <div className="app" style={{ fontFamily: font }}>
       <NavBar font={font} setFont={setFont} onHandleFont={handleFont} changeMood={changeMood} setIsChangeMood={setIsChangeMood}/>
       <div className="centeredDiv">
-        <SearchInput query={query} setQuery={setQuery} changeMood={changeMood}/>
+        <SearchInput query={query} setQuery={setQuery} changeMood={changeMood} setSearchWord={setSearchWord}/>
 
        {error ? <p style={changeTextColor}>{error}</p>: <WordDefinitionBox words1={words1} changeMood={changeMood} setIsChangeMood={setIsChangeMood}/>}
       </div>
@@ -94,17 +102,19 @@ function NavBar({ font, setFont, onHandleFont, changeMood, setIsChangeMood}) {
   );
 }
 
-function SearchInput({ query, setQuery, changeMood }) {
+function SearchInput({ query, setQuery, changeMood, setSearchWord }) {
   function handleSubmit(e) {
     e.preventDefault();
-    setQuery("");
+    setSearchWord(query)
+
+    // setQuery("");
   }
   return (
     <form className="searchbar" onSubmit={handleSubmit}>
       <input
         type="text"
         className={changeMood ? "inputLightMood" : "inputDarkMood"}
-        // value={query}
+         //value={query}
         placeholder="search for any word"
         onChange={(e) => setQuery(e.target.value)
         
