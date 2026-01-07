@@ -1,43 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-// const words = [
-//   {
-//     word: "keyboard",
-//     phonetic: "/ki:bc:d/",
-//     partOfSpeech1: "noun",
-//     partOfSpeech2: "verb",
-//     definitions1: [
-//       { definition: "set of keys" },
-//       { definition: " a component of many instructions" },
-//     ],
-//     definitions2: [
-//       {
-//         definition: "To type on a computer keyboard",
-//       },
-//     ],
-//     audio:
-//       "https://api.dictionaryapi.dev/media/pronunciations/en/keyboard-us.mp3",
-//     source: ["https://en.wiktionary.org/wiki/keyboard"],
-//   },
-// ];
-//import "./tailwind.css";
+
 function App() {
-  const [query, setQuery] = useState("keyboard");
+  const [query, setQuery] = useState("apple");
   const [words1, setWords1] = useState([]);
   const [font, setFont] = useState("sans-serif");
   const [changeMood, setIsChangeMood] = useState(false)
   const [error,setError] = useState("")
-  
+  const changeTextColor = changeMood ? {color:"black", textAlign:"center" } : {color:"white", textAlign:"center"}
   function handleFont(chooseFont) {
     setFont(chooseFont);
   }
   useEffect(
     function () {
-      // const controller = new AbortController();
+       //const controller = new AbortController();
       async function fetchWordMeaning() {
         try {
           const res = await fetch(
             `https://api.dictionaryapi.dev/api/v2/entries/en/${query}`,
-            // { signal: controller.signal }
+            //{ signal: controller.signal }
           );
           if (res.status === 404) throw new Error(`${query} is not a valid word ❌`);
           if (!res.ok) throw new Error(`Error ${res.status}:server error❌`);
@@ -73,7 +53,7 @@ function App() {
       <div className="centeredDiv">
         <SearchInput query={query} setQuery={setQuery} changeMood={changeMood}/>
 
-       {error ? <p style={{color:"white", textAlign:'center'}}>{error}</p>: <WordDefinitionBox words1={words1} changeMood={changeMood} setIsChangeMood={setIsChangeMood}/>}
+       {error ? <p style={changeTextColor}>{error}</p>: <WordDefinitionBox words1={words1} changeMood={changeMood} setIsChangeMood={setIsChangeMood}/>}
       </div>
     </div>
   );
@@ -102,7 +82,7 @@ function NavBar({ font, setFont, onHandleFont, changeMood, setIsChangeMood}) {
             borderLeft: "1px solid gray",
             height: "30px",
             marginLeft:"5px"
-            //border: "1px solid blac",
+           
           }}
         ></p>
         <button onClick={handleSwitch} className="switch_btn">
@@ -124,7 +104,7 @@ function SearchInput({ query, setQuery, changeMood }) {
       <input
         type="text"
         className={changeMood ? "inputLightMood" : "inputDarkMood"}
-        value={query}
+        // value={query}
         placeholder="search for any word"
         onChange={(e) => setQuery(e.target.value)
         
